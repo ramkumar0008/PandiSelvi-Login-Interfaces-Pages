@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+// Render backend URL
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+  import.meta.env.VITE_API_URL ||
+  "https://pandiselvi-login-interfaces-pages.onrender.com";
 
 function Register() {
   const navigate = useNavigate();
@@ -11,29 +13,36 @@ function Register() {
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
-
   const [loading, setLoading] = useState(false);
+
+  // ===============================
+  // HANDLE INPUT CHANGE
+  // ===============================
 
   const handleChange = (event) => {
     const { name, value } = event.target;
 
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
 
     setErrors({
       ...errors,
-      [name]: ""
+      [name]: "",
     });
 
     setServerError("");
   };
+
+  // ===============================
+  // FORM VALIDATION
+  // ===============================
 
   const validateForm = () => {
     const newErrors = {};
@@ -41,15 +50,15 @@ function Register() {
     const emailPattern =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    // Name validation
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
-    } else if (
-      formData.name.trim().length < 3
-    ) {
+    } else if (formData.name.trim().length < 3) {
       newErrors.name =
         "Name must contain at least 3 characters";
     }
 
+    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (
@@ -59,16 +68,16 @@ function Register() {
         "Enter a valid email address";
     }
 
+    // Password validation
     if (!formData.password) {
       newErrors.password =
         "Password is required";
-    } else if (
-      formData.password.length < 8
-    ) {
+    } else if (formData.password.length < 8) {
       newErrors.password =
         "Password must contain at least 8 characters";
     }
 
+    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword =
         "Please confirm your password";
@@ -84,6 +93,10 @@ function Register() {
 
     return Object.keys(newErrors).length === 0;
   };
+
+  // ===============================
+  // REGISTER
+  // ===============================
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -103,14 +116,14 @@ function Register() {
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
 
           body: JSON.stringify({
             name: formData.name.trim(),
             email: formData.email.trim(),
-            password: formData.password
-          })
+            password: formData.password,
+          }),
         }
       );
 
@@ -122,12 +135,9 @@ function Register() {
         );
       }
 
-      alert(
-        "Account created successfully!"
-      );
+      alert("Account created successfully!");
 
       navigate("/login");
-
     } catch (error) {
       setServerError(
         error.message ||
@@ -137,6 +147,10 @@ function Register() {
       setLoading(false);
     }
   };
+
+  // ===============================
+  // UI
+  // ===============================
 
   return (
     <div className="page">
@@ -150,7 +164,9 @@ function Register() {
             N
           </div>
 
-          <h1>Pandi Selvi Login Page</h1>
+          <h1>
+            Pandi Selvi Login Page
+          </h1>
 
           <p>
             Create your account and get started.
@@ -169,6 +185,7 @@ function Register() {
             Create your PandiSelvi Login Page account.
           </p>
 
+          {/* Backend Error */}
           {serverError && (
             <div className="alert error">
               {serverError}
@@ -256,6 +273,7 @@ function Register() {
               </div>
             )}
 
+            {/* Register Button */}
             <button
               type="submit"
               className="primary"
@@ -268,10 +286,12 @@ function Register() {
 
           </form>
 
+          {/* Separator */}
           <div className="separator">
             <span>OR</span>
           </div>
 
+          {/* Login */}
           <p className="center muted">
             Already have an account?
           </p>
@@ -292,3 +312,4 @@ function Register() {
 }
 
 export default Register;
+

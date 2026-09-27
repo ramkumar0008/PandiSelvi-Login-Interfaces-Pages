@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+// Render backend URL
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+  import.meta.env.VITE_API_URL ||
+  "https://pandiselvi-login-interfaces-pages.onrender.com";
 
 function Login() {
   const navigate = useNavigate();
@@ -12,14 +14,17 @@ function Login() {
 
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
-
   const [loading, setLoading] = useState(false);
+
+  // ===============================
+  // FORM VALIDATION
+  // ===============================
 
   const validateForm = () => {
     const newErrors = {};
 
-    const emailPattern =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Correct email pattern
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email.trim()) {
       newErrors.email = "Email is required";
@@ -39,6 +44,10 @@ function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // ===============================
+  // LOGIN
+  // ===============================
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -53,31 +62,26 @@ function Login() {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        `${API_URL}/api/login`,
-        {
-          method: "POST",
+      const response = await fetch(`${API_URL}/api/login`, {
+        method: "POST",
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-          body: JSON.stringify({
-            email: email.trim(),
-            password: password
-          })
-        }
-      );
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message || "Login failed"
-        );
+        throw new Error(data.message || "Login failed");
       }
 
-      // Save user
+      // Save logged-in user
       localStorage.setItem(
         "user",
         JSON.stringify(data.user)
@@ -85,7 +89,6 @@ function Login() {
 
       // Go to dashboard
       navigate("/dashboard");
-
     } catch (error) {
       setServerError(
         error.message ||
@@ -96,14 +99,16 @@ function Login() {
     }
   };
 
+  // ===============================
+  // UI
+  // ===============================
+
   return (
     <div className="page">
-
       <div className="auth-wrapper">
 
         {/* Brand */}
         <div className="brand">
-
           <div className="logo">
             N
           </div>
@@ -113,7 +118,6 @@ function Login() {
           <p>
             Simple. Secure. Modern.
           </p>
-
         </div>
 
         {/* Login Card */}
@@ -127,7 +131,7 @@ function Login() {
             Sign in to continue to your account.
           </p>
 
-          {/* Backend error */}
+          {/* Backend Error */}
           {serverError && (
             <div className="alert error">
               {serverError}
@@ -153,7 +157,7 @@ function Login() {
 
                 setErrors({
                   ...errors,
-                  email: ""
+                  email: "",
                 });
               }}
             />
@@ -178,7 +182,7 @@ function Login() {
 
                 setErrors({
                   ...errors,
-                  password: ""
+                  password: "",
                 });
               }}
             />
@@ -189,7 +193,7 @@ function Login() {
               </div>
             )}
 
-            {/* Login */}
+            {/* Login Button */}
             <button
               type="submit"
               className="primary"
@@ -202,10 +206,12 @@ function Login() {
 
           </form>
 
+          {/* Separator */}
           <div className="separator">
             <span>OR</span>
           </div>
 
+          {/* Register */}
           <p className="center muted">
             Don't have an account?
           </p>
@@ -217,7 +223,7 @@ function Login() {
             Create Account
           </Link>
 
-          {/* Demo account */}
+          {/* Demo Account */}
           <div className="demo">
 
             <strong>
@@ -235,11 +241,10 @@ function Login() {
           </div>
 
         </div>
-
       </div>
-
     </div>
   );
 }
 
 export default Login;
+
