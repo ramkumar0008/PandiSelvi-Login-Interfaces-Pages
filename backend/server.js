@@ -1,222 +1,170 @@
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-// ===============================
-// MIDDLEWARE
-// ===============================
-
 app.use(
   cors({
-    origin: true
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.use(express.json());
-
-
-// ===============================
-// MOCK USER DATA
-// ===============================
 
 let users = [
   {
     id: 1,
     name: "Demo User",
     email: "demo@gmail.com",
-    password: "12345678"
-  }
+    password: "12345678",
+  },
 ];
 
-
-// ===============================
-// TEST BACKEND
-// ===============================
-
+// Home route
 app.get("/", (req, res) => {
-  res.send("NexaFlow Backend is Running");
+  res.json({
+    success: true,
+    message: "PandiSelvi Backend is Running",
+  });
 });
 
-
-// ===============================
-// HEALTH CHECK
-// ===============================
-
+// Health check
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
-    message: "Backend server is running"
+    message: "Backend server is running",
   });
 });
 
-
-// ===============================
-// CREATE ACCOUNT / REGISTER
-// ===============================
-
+// Register
 app.post("/api/register", (req, res) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  // Check empty fields
-  if (!name || !email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "All fields are required"
-    });
-  }
-
-  // Email validation
-  const emailPattern =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailPattern.test(email)) {
-    return res.status(400).json({
-      success: false,
-      message: "Please enter a valid email address"
-    });
-  }
-
-  // Password validation
-  if (password.length < 8) {
-    return res.status(400).json({
-      success: false,
-      message:
-        "Password must contain at least 8 characters"
-    });
-  }
-
-  // Check if email already exists
-  const existingUser = users.find(
-    (user) =>
-      user.email.toLowerCase() ===
-      email.toLowerCase()
-  );
-
-  if (existingUser) {
-    return res.status(409).json({
-      success: false,
-      message:
-        "An account with this email already exists"
-    });
-  }
-
-  // Create new user
-  const newUser = {
-    id: users.length + 1,
-    name: name.trim(),
-    email: email.trim(),
-    password: password
-  };
-
-  users.push(newUser);
-
-  console.log(
-    "New account created:",
-    newUser.email
-  );
-
-  return res.status(201).json({
-    success: true,
-    message: "Account created successfully",
-
-    user: {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
     }
-  });
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must contain at least 8 characters",
+      });
+    }
+
+    const existingUser = users.find(
+      (user) =>
+        user.email.toLowerCase() === email.trim().toLowerCase()
+    );
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "An account with this email already exists",
+      });
+    }
+
+    const newUser = {
+      id: users.length + 1,
+      name: name.trim(),
+      email: email.trim(),
+      password,
+    };
+
+    users.push(newUser);
+
+    console.log("New account created:", newUser.email);
+
+    return res.status(201).json({
+      success: true,
+      message: "Account created successfully",
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+      },
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error during registration",
+    });
+  }
 });
 
-
-// ===============================
-// LOGIN
-// ===============================
-
+// Login
 app.post("/api/login", (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  // Check empty fields
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message:
-        "Email and password are required"
-    });
-  }
-
-  // Find user
-  const user = users.find(
-    (user) =>
-      user.email.toLowerCase() ===
-      email.toLowerCase()
-  );
-
-  // User not found
-  if (!user) {
-    return res.status(401).json({
-      success: false,
-      message:
-        "Invalid email or password"
-    });
-  }
-
-  // Password doesn't match
-  if (user.password !== password) {
-    return res.status(401).json({
-      success: false,
-      message:
-        "Invalid email or password"
-    });
-  }
-
-  // Login successful
-  console.log(
-    "Login successful:",
-    user.email
-  );
-
-  return res.status(200).json({
-    success: true,
-    message: "Login successful",
-
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
     }
-  });
+
+    const user = users.find(
+      (user) =>
+        user.email.toLowerCase() === email.trim().toLowerCase()
+    );
+
+    if (!user || user.password !== password) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    console.log("Login successful:", user.email);
+
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error during login",
+    });
+  }
 });
 
-
-// ===============================
-// UNKNOWN API ROUTE
-// ===============================
-
+// Unknown API route
 app.use("/api", (req, res) => {
   res.status(404).json({
     success: false,
-    message: "API route not found"
+    message: "API route not found",
   });
 });
 
-
-// ===============================
-// START SERVER
-// ===============================
-
 app.listen(PORT, () => {
-  console.log("");
   console.log("=================================");
-  console.log(
-    `Server running on http://localhost:${PORT}`
-  );
-  console.log(
-    `Health check: http://localhost:${PORT}/api/health`
-  );
+  console.log(`Server running on port ${PORT}`);
   console.log("=================================");
-  console.log("");
 });
