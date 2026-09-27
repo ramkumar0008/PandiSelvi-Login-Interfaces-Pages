@@ -155,7 +155,7 @@ function LoginPage({
           </div>
 
           <div>
-            <h1>PandiSelvi Login Page</h1>
+            <h1>NexaFlow</h1>
             <p>Smart. Simple. Secure.</p>
           </div>
 
@@ -421,7 +421,7 @@ function RegisterPage({
           </div>
 
           <div>
-            <h1>Pandiselvi Login Page</h1>
+            <h1>NexaFlow</h1>
             <p>Smart. Simple. Secure.</p>
           </div>
 
@@ -433,7 +433,7 @@ function RegisterPage({
           <h2>Create your account</h2>
 
           <p>
-            Join Login Page and get started today
+            Join NexaFlow and get started today
           </p>
 
         </div>
@@ -606,7 +606,7 @@ function Dashboard({
           </div>
 
           <div>
-            <h2>Pandi Selvi Login Page</h2>
+            <h2>NexaFlow</h2>
             <span>Dashboard</span>
           </div>
 
